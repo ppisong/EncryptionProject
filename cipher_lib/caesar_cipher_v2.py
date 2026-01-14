@@ -15,23 +15,12 @@ def caesar_cipher(text, shift, left=True):
     return(cipher_text)
 
 
+# 메인이 아니면 if __name__ 절이 작동하지 않는다
 if __name__ == '__main__':
     text = "hello world"
     # encrypted = caesar_cipher(text, 3, True)
     encrypted = caesar_cipher(text, 3)
     print(encrypted)
     decrypted = caesar_cipher(encrypted, 3,False)
-    print(decrypted)
-
-    text = "HELLO WORLD"
-    encrypted = caesar_cipher(text, 3)
-    print(encrypted)
-    decrypted = caesar_cipher(encrypted, 3, False)
-    print(decrypted)
-
-    text = "Hello World"
-    encrypted = caesar_cipher(text, 3)
-    print(encrypted)
-    decrypted = caesar_cipher(encrypted, 3, False)
     print(decrypted)
 
