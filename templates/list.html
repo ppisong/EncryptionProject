@@ -8,7 +8,7 @@
 
 </head>
 <body>
-<h1>회원 목록</h1>
+<h1>회원목록</h1>
 
 
 <table class="table">
@@ -24,11 +24,11 @@
         <tbody>
         {% for m in members %}
         <tr class="table-info">
-            <td>{{ m[0] }}</td>
-            <td>{{ m[1] }}</td>
-            <td>{{ m[2] }}</td>
-            <td>{{ m[3] }}</td>
-            <td>{{ m[4] }}</td>
+            <td>{{ m['memberid'] }}</td>
+            <td>{{ m['username'] }}</td>
+            <td>{{ m['name'] }}</td>
+            <td>{{ m['email'] }}</td>
+            <td>{{ m['regdate'] }}</td>
         </tr>
         {% endfor %}
 
