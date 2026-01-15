@@ -3,7 +3,7 @@ from fastapi.responses import HTMLResponse
 from fastapi import FastAPI
 from db import init_db
 from routers.member import router as router_member
-
+from routers.board import router as router_board
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -12,6 +12,7 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(lifespan=lifespan)
 app.include_router(router_member)
+app.include_router(router_board)
 
 
 @app.get("/", response_class=HTMLResponse)
