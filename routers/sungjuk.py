@@ -76,9 +76,15 @@ async def sungjuk_detail(request: Request, sjno: int):
         "sj": sungjuk
     })
 
-@router.get("/{sjno}/delete", response_class=HTMLResponse)
+#@router.post으로 설정하는 경우 오류 발생
+@router.post("/{sjno}/delete", response_class=HTMLResponse)
 async def sungjuk_delete(sjno: int):
-    pass
+    async with aiosqlite.connect(SungJukDB_NAME) as db:
+        await db.execute("DELETE FROM sungjuk WHERE sjno = ?", (sjno,))
+        await db.commit()
+    # 게시글 삭제 후 게시판 목록으로 전환
+    # status_code=303이 오면 board로 다시 가라
+    return RedirectResponse(url="/sungjuk/list", status_code=303)
 
 
 @router.get("/{sjno}/edit", response_class=HTMLResponse)
