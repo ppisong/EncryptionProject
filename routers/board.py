@@ -5,6 +5,7 @@ from settings import templates, BoardDB_NAME
 
 # board 라우터 설정
 router = APIRouter(prefix="/board", tags=["board"])
+
 @router.get("/list", response_class=HTMLResponse)
 async def board_list(request: Request):
     async with aiosqlite.connect(BoardDB_NAME) as db:
@@ -32,7 +33,13 @@ async def board_list(request: Request):
 # 게시판 글쓰기 폼
 @router.get("/new", response_class=HTMLResponse)
 def board_new_form(request: Request):
-    return templates.TemplateResponse("board/board_new.html", {"request": request})
+    # 로그인하지 않았다면 /member/login로 이동
+    if request.session.get("user") is None:
+        return RedirectResponse(url="/member/list", status_code=303)
+
+    # 세션 변수 user에서 ㅕㄴㄷ구믇
+    return templates.TemplateResponse("board/board_new.html",
+                {"request": request, "username": request.session.get("user")['username']})
 
 # 게시판 글쓰기 처리
 @router.post("/new")
