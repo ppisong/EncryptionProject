@@ -45,6 +45,10 @@ async def joinok(request: Request, username: str = Form(...),
 
 @router.get("/list", response_class=HTMLResponse)
 async def member_list(request: Request):
+    # 로그인하지 않았다면 /member/login로 이동
+    if request.session.get("user") is None:
+        return RedirectResponse(url="/board/list", status_code=303)
+
     async with aiosqlite.connect(MemberDB_NAME) as db:
         results = await db.execute_fetchall("""
                                             SELECT memberid, username, name, email, regdate
@@ -70,7 +74,7 @@ async def login_form(request: Request):
     if request.session.get("user"):
         return RedirectResponse(url="/board/list", status_code=303)
 
-    return templates.TemplateResponse("member/login.html", {"request": request})
+    return templates.TemplateResponse("member/login1.html", {"request": request})
 
 
 # 요청이 들어오면 입력한 로그인정보가 테이블에 존재하는지 여부 확인
