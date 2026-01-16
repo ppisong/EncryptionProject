@@ -92,7 +92,7 @@ async def login(request: Request, username: str = Form(...), password: str = For
             "error": "아이디 또는 비밀번호가 올바르지 않습니다."
         })
 
-    # 세션에 저장(필요한 최소 정보만)
+    # 세션에 저장(필요한 최소 정보만) "user'를 만드는 부분이 로그인 로그아웃에서는 중요
     request.session["user"] = {
         "username": member[0],
         "name": member[1]
@@ -112,3 +112,8 @@ async def login(request: Request, username: str = Form(...), password: str = For
         "request": request,
         "member": member
     })
+
+@router.get("/logout")
+async def logout(request: Request):
+    request.session.clear()   #세션 변수 제거
+    return RedirectResponse(url="/member/login", status_code=303)
