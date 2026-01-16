@@ -84,6 +84,12 @@ async def login(request: Request, username: str = Form(...), password: str = For
             "error": "아이디 또는 비밀번호가 올바르지 않습니다."
         })
 
+    # 세션에 저장(필요한 최소 정보만)
+    request.session["user"] = {
+        "username": member[0],
+        "name": member[1]
+    }
+
     # 조회한 데이터를 JSON형식으로 생성, JSON형식이란 {}객체 안에 "key":value 형태로,
     # 그러나 pydantic에는 이런 복잡한 작업 필요 없어
     # list쪽의 fetchall과 달리 fetchone
