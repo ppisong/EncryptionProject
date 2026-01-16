@@ -1,5 +1,5 @@
 
-from settings import BoardDB_NAME,MemberDB_NAME
+from settings import BoardDB_NAME, MemberDB_NAME, SungJukDB_NAME
 import aiosqlite
 
 
@@ -25,6 +25,22 @@ async def init_db():
                            name TEXT,
                            email TEXT UNIQUE,
                            regdate TEXT DEFAULT (datetime('now','localtime'))
+                             )
+                         """)
+        await db.commit()
+
+    async with aiosqlite.connect(SungJukDB_NAME) as db:
+        await db.execute("""
+                         CREATE TABLE IF NOT EXISTS sungjuk(
+                               sjno INTEGER PRIMARY KEY AUTOINCREMENT,
+                               name varchar(10) NOT NULL UNIQUE,
+                               kor int NOT NULL,
+                               eng int NOT NULL,
+                               mat int NOT NULL,
+                               tot int default 0,
+                               avg float default 0.0,
+                               grd char(2) default 'F',
+                               regdate datetime DEFAULT current_timestamp
                              )
                          """)
         await db.commit()
