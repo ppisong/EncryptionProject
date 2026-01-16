@@ -1,6 +1,7 @@
 import aiosqlite
 from fastapi import Request, APIRouter, Form
 from fastapi.responses import HTMLResponse,RedirectResponse
+from db import SungJuk_New_SQL
 from settings import templates, SungJukDB_NAME
 
 router = APIRouter(prefix="/sungjuk", tags=["sungjuk"])
@@ -37,11 +38,11 @@ async def sungjuk_newform(request: Request, ):
 @router.post("/new", response_class=HTMLResponse)
 async def sungjuk_new(request: Request,
     name: str = Form(...), kor: int = Form(...), eng: int = Form(...), mat: int = Form(...)):
+    # 성적 처리. 이 위치에 꼭 있어야 할 이유는 없지만 같은 것끼리 모은다
     tot, avg, grd = compute_sungjuk(kor, eng, mat)
+
     async with aiosqlite.connect(SungJukDB_NAME) as db:
-        await db.execute(
-            """INSERT INTO sungjuk (name, kor, eng, mat, tot, avg, grd) 
-            VALUES (?, ?, ?, ?, ?, ?, ?)""",
+        await db.execute(SungJuk_New_SQL,
             (name, kor, eng, mat, tot, avg, grd))
 
         await db.commit()
@@ -50,7 +51,30 @@ async def sungjuk_new(request: Request,
 
 @router.get("/{sjno}", response_class=HTMLResponse)
 async def sungjuk_detail(request: Request, sjno: int):
-    pass
+    async with aiosqlite.connect(SungJukDB_NAME) as db:
+        # 상세 조회
+        async with db.execute("SELECT * FROM sungjuk WHERE sjno = ?", (sjno,)) as cur:
+            result = await cur.fetchone()
+    if result is None:
+        return HTMLResponse("해당 글이 존재하지 않습니다.", status_code=404)
+
+    sungjuk = {
+        "sjno": result[0],
+        "name": result[1],
+        "kor": result[2],
+        "eng": result[3],
+        "mat": result[4],
+        "tot": result[5],
+        "avg": result[6],  #round(result[6],1), # 한자리수까지만 표시
+        "grd": result[7],
+        "regdate": result[8]
+
+    }
+
+    return templates.TemplateResponse("sungjuk/sungjuk_detail.html", {
+        "request": request,
+        "sj": sungjuk
+    })
 
 @router.get("/{sjno}/delete", response_class=HTMLResponse)
 async def sungjuk_delete(sjno: int):
