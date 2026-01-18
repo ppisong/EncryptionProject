@@ -5,6 +5,8 @@ from db import init_db
 from routers.member import router as router_member
 from routers.board import router as router_board
 from routers.sungjuk import router as router_sungjuk
+from starlette.middleware.sessions import SessionMiddleware
+import os
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -15,7 +17,7 @@ app = FastAPI(lifespan=lifespan)
 app.include_router(router_member)
 app.include_router(router_board)
 app.include_router(router_sungjuk)
-
+app.add_middleware(SessionMiddleware, secret_key=os.getenv("SESSION_SECRET_KEY"))
 
 @app.get("/", response_class=HTMLResponse)
 def index():

@@ -38,7 +38,7 @@ def board_new_form(request: Request):
     if request.session.get("user") is None:
         return RedirectResponse(url="/member/list", status_code=303)
 
-    # 세션 변수 user에서 ㅕㄴㄷ구믇
+    # 세션 변수 user에서 username을 반환
     return templates.TemplateResponse("board/board_new.html",
                 {"request": request, "username": request.session.get("user")['username']})
 
@@ -96,11 +96,21 @@ async def board_delete(request:Request, bdno: int):
         return RedirectResponse(url="/member/login", status_code=303)
 
     # 자신이 쓴 글이 아니면 /board/list로 이동
-    # 혼자 해보기(user에 뭔가 추가해야)
-
-
     async with aiosqlite.connect(BoardDB_NAME) as db:
-        await db.execute("DELETE FROM board WHERE bdno = ?", (bdno,))
+        cursor = await db.execute("SELECT username FROM board WHERE bdno = ?",  (bdno,))
+        row = await cursor.fetchone()
+        await cursor.close()
+
+        if not row:
+            return RedirectResponse(url="/board/list", status_code=303)
+
+        writer_username = row[0]
+
+        if writer_username != request.session.get("user")["username"]:
+            return RedirectResponse(url="/board/login", status_code=303)
+
+        await db.execute(
+            "DELETE FROM board WHERE bdno = ?", (bdno,))
         await db.commit()
     # 게시글 삭제 후 게시판 목록으로 전환
     # status_code=303이 오면 board로 다시 가라
